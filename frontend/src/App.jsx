@@ -1,19 +1,33 @@
-import { useState } from "react";
+
 import { Container, Form, Button, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
 import './App.css';
+import { useEffect, useState } from "react";
+
+
+
 
 
 function App() {
+  useEffect(() => {
+  document.title = "QA Buddy Helper"; // 
+}, []);
+
+  
   const [jiraText, setJiraText] = useState("");
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
   const [loadingMode, setLoadingMode] = useState(null); // 'manual' | 'automation' | null
-  const [ticketId, setTicketId] = useState(""); // 👈 JIRA ticket ID
+  const [ticketId, setTicketId] = useState(""); //  JIRA ticket ID
+  const [darkMode, setDarkMode] = useState(false);
+  const [selectedMode, setSelectedMode] = useState(null); //Manual k liye csv aayega , playwright k liye nhi aayega
+
+
 
   const handleSubmit = async (mode) => {
     setLoadingMode(mode);
     setError("");
+    setSelectedMode(mode);
     setResponse("");
 
     try {
@@ -42,11 +56,26 @@ function App() {
       console.error("❌ JIRA fetch error", err);
     }
   };
+  const handleDownloadCSV = () => {
+  const rows = response
+    .split("\n")
+    .map((line) => line.split("|").map((cell) => cell.trim()));
+
+  let csvContent = rows.map((e) => e.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", "test_cases.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
   return (
     
-    
-    <Container className="mt-5">
+    <Container className={`mt-5 ${darkMode ? 'dark-mode' : ''}`}>
       <div className="qa-section">
   <div className="qa-links">
     <a href="https://www.guru99.com/manual-testing.html" target="_blank" rel="noopener noreferrer">
@@ -69,8 +98,17 @@ function App() {
 
       {/* 📚 Horizontal QA Study Links */}
 {/* 📚 QA Study Material Section */}
+<div className="d-flex justify-content-end mb-3">
+  <Form.Check 
+    type="switch"
+    id="dark-mode-switch"
+    label={darkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
+    checked={darkMode}
+    onChange={() => setDarkMode(!darkMode)}
+  />
+</div>
 
-      <h2 className="mb-4 text-center">🧪 JoJo Ka Dost</h2>
+      <h2 className="mb-4 text-center">QA-Buddy-Jojo</h2>
       
       {/* 🎟️ JIRA Ticket Fetch Section */}
       <Form.Group className="mb-3">
@@ -147,13 +185,30 @@ function App() {
           </Button>
         </div>
       </Form>
+      
 
       {error && <Alert variant="danger" className="mt-4">{error}</Alert>}
-      {response && (
-        <Alert variant="success" className="mt-4" style={{ whiteSpace: "pre-wrap" }}>
-          {response}
-        </Alert>
-      )}
+{response && (
+  <>
+    <div className="result-box mt-4">
+      <pre>
+        <code>{response}</code>
+      </pre>
+    </div>
+
+    {/* Show CSV button only if mode is 'manual' */}
+    {selectedMode === "manual" && (
+      <div className="d-flex justify-content-center mt-3">
+        <Button variant="info" onClick={handleDownloadCSV}>
+          📥 Export to CSV
+        </Button>
+      </div>
+    )}
+  </>
+)}
+
+
+
     </Container>
   );
 }
