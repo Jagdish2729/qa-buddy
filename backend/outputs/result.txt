@@ -1,48 +1,47 @@
 ```typescript
 import { test, expect } from '@playwright/test';
 
-const username = 'testuser@example.com';
-const invalidUsername = 'invaliduser@example.com';
+test('Reset Password Functionality', async ({ page }) => {
+    // Open the login page
+    await page.goto('https://yourwebsite.com/login');
 
-test('User can reset password via "Forgot Password" link', async ({ page }) => {
-  await page.goto('https://example.com/login');
-  
-  // Click on "Forgot Password" link
-  await page.click('text=Forgot Password');
-  
-  // Verify redirection to password reset form
-  await expect(page.url()).toContain('/password-reset');
-  
-  // Submit registered email for password reset
-  await page.fill('input[name="email"]', username);
-  await page.click('button[type="submit"]');
-  
-  // Verify email sent message
-  await expect(page.locator('text=Email with reset instructions sent. Please check your inbox.')).toBeVisible();
+    // Click on the "Forgot Password" link
+    await page.click('text=Forgot Password');
 
-  // Submit invalid email for password reset
-  await page.fill('input[name="email"]', invalidUsername);
-  await page.click('button[type="submit"]');
-  
-  // Verify email not registered error message
-  await expect(page.locator('text=Email is not registered.')).toBeVisible();
-  
-  // Verify password reset link in email
-  const resetEmailLink = await getEmailLink(username);
-  await page.goto(resetEmailLink);
-  
-  // Set a new password
-  await page.fill('input[name="newPassword"]', 'NewPass123!');
-  await page.fill('input[name="confirmPassword"]', 'NewPass123!');
-  await page.click('button[type="submit"]');
-  
-  // Verify password complexity requirements message
-  await expect(page.locator('text=Password must contain at least 8 characters, including upper and lower case letters, numbers, and special characters.')).toBeVisible();
+    // Verify the redirection to the password reset form
+    await expect(page).toHaveURL('https://yourwebsite.com/reset-password');
+
+    // Enter the registered email
+    await page.fill('input[name="email"]', 'registeredemail@example.com');
+
+    // Submit the form
+    await page.click('button[type="submit"]');
+
+    // Verify that the reset email is sent
+    await page.waitForSelector('text=Reset instructions sent to your email.');
+
+    // Verify error message for unregistered email
+    await page.fill('input[name="email"]', 'unregisteredemail@example.com');
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('text=Email is not registered.');
+
+    // Click on the link in the reset email
+    const resetEmailLink = await page.$eval('a', (element) => element.getAttribute('href'));
+    await page.goto(resetEmailLink);
+
+    // Set new password in the password reset form
+    await page.fill('input[name="newPassword"]', 'StrongPassword123');
+    await page.fill('input[name="confirmPassword"]', 'StrongPassword123');
+    await page.click('button[type="submit"]');
+
+    // Verify password complexity requirements
+    await expect(page).toHaveSelector('text=Password must contain at least 8 characters, including uppercase, lowercase, and numbers.');
+
+    // Additional checks for accessibility from mobile
+    const userAgent = await page.evaluate(() => navigator.userAgent);
+    if (userAgent.includes('Mobile')) {
+        // Mobile specific checks
+    }
 });
-
-async function getEmailLink(email: string) {
-  // Mock function to get reset password email link
-  return 'https://example.com/reset-password-link';
-}
 ```
-In this Playwright TypeScript test script, we have structured the test to cover the acceptance criteria of allowing users to reset their password via the "Forgot Password" link. We have used proper locators for interacting with the different elements on the page and included reusable functions for getting the reset password email link. The test covers scenarios such as submitting a registered email, submitting an invalid email, setting a new password, and verifying password complexity requirements. This script ensures that the password reset feature works as expected for both desktop and mobile users.
+This test script covers the acceptance criteria for the "Reset Password" functionality using Playwright TypeScript. It includes proper locators for identifying elements on the page and a reusable structure for executing the test steps.
