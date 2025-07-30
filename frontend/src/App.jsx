@@ -183,6 +183,62 @@ function App() {
               "Generate Playwright Script"
             )}
           </Button>
+          <Button
+  variant="warning"
+  onClick={() => handleSubmit("gherkin")}
+  disabled={loadingMode !== null}
+>
+  {loadingMode === "gherkin" ? (
+    <>
+      <Spinner
+        as="span"
+        animation="border"
+        size="sm"
+        role="status"
+        aria-hidden="true"
+      />{" "}
+      Generating...
+    </>
+  ) : (
+    "Generate Gherkin Test Cases"
+  )}
+</Button>
+<Button
+  variant="dark"
+  onClick={() => handleSubmit("java")}
+  disabled={loadingMode !== null}
+>
+  {loadingMode === "java" ? (
+    <>
+      <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{" "}
+      Generating...
+    </>
+  ) : (
+    "Generate Java Selenium Script"
+  )}
+</Button>
+<Button
+  variant="dark"
+  onClick={() => handleSubmit("appium")}
+  disabled={loadingMode !== null}
+>
+  {loadingMode === "appium" ? (
+    <>
+      <Spinner
+        as="span"
+        animation="border"
+        size="sm"
+        role="status"
+        aria-hidden="true"
+      />{" "}
+      Generating...
+    </>
+  ) : (
+    "Generate Appium Code"
+  )}
+</Button>
+
+
         </div>
       </Form>
       
