@@ -1,0 +1,3 @@
+As a user, I should be able to login using my email and password.
+If credentials are correct, I should be redirected to the dashboard.
+If incorrect, I should see an error message.
