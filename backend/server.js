@@ -3,18 +3,18 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const generateTestCases = require("./openaiService");
-const { getJiraTicketDetails } = require("./jiraService"); // ✅ JIRA service import
+const { getJiraTicketDetails } = require("./jiraService"); //  JIRA service import
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// 🎯 Route for generating test cases
+// Route for generating test cases
 app.post("/generate", async (req, res) => {
   const { jiraText, mode } = req.body;
-  console.log("📥 Received JIRA text:", jiraText);
-  console.log("📦 Mode selected:", mode);
+  console.log(" Received JIRA text:", jiraText);
+  console.log(" Mode selected:", mode);
 
   try {
     const result = await generateTestCases(jiraText, mode);
@@ -25,10 +25,10 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-// 🆕 Route to fetch ticket summary + description from JIRA
+//  Route to fetch ticket summary + description from JIRA
 app.post("/jira-ticket", async (req, res) => {
   const { ticketId } = req.body;
-  console.log("🔎 Fetching JIRA ticket:", ticketId);
+  console.log(" Fetching JIRA ticket:", ticketId);
 
   try {
     const text = await getJiraTicketDetails(ticketId);
