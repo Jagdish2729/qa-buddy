@@ -114,6 +114,27 @@ html, body, #root {
 body {
   overflow-x: hidden;
 }
+/* Auth page styles */
+.auth-bg {
+  background: linear-gradient(135deg, #0d6efd11, #6610f211);
+  min-height: 100vh;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+}
+
+.role-card {
+  border-radius: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+}
+
 
 
 

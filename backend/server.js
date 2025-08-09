@@ -1,14 +1,17 @@
-// backend/server.js
+require("dotenv").config();
+console.log("🔐 OPENROUTER_API_KEY present?", !!process.env.OPENROUTER_API_KEY);
+console.log("🌐 OPENROUTER_BASE_URL:", process.env.OPENROUTER_BASE_URL);
+const authRoutes = require("./authRoutes");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const generateTestCases = require("./openaiService");
 const { getJiraTicketDetails } = require("./jiraService"); //  JIRA service import
-require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use("/auth", authRoutes);
 
 // Route for generating test cases
 app.post("/generate", async (req, res) => {
