@@ -21,7 +21,7 @@ export default function Home() {
         </Col>
 
         <Col md={4}>
-          <Card className="role-card shadow-sm" role="button" onClick={() => navigate("/coming-soon?role=po")}>
+          <Card className="role-card shadow-sm" role="button" onClick={() => navigate("/po")}>
             <Card.Body className="text-center">
               <div style={{ fontSize: 40 }}>📋</div>
               <h5 className="mt-2 mb-1">I am a Product Owner</h5>

@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-// 🔁 Recursively extract all text nodes from Atlassian Document Format
+//  Recursively extract all text nodes from Atlassian Document Format
 function extractTextFromADF(adf) {
   if (!adf || typeof adf !== "object") return "";
   if (adf.type === "text" && adf.text) return adf.text;

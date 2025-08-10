@@ -7,13 +7,14 @@ import ComingSoon from "./pages/Comingsoon";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth";
 import { isLoggedIn, logout } from "./utils/auth";
+import PO from "./pages/PO";
 
 function App() {
   useEffect(() => {
     document.title = "QA Buddy Helper";
   }, []);
 
-  // ---- STATE (your existing) ----
+  // ---- STATE
   const [jiraText, setJiraText] = useState("");
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
@@ -22,7 +23,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [selectedMode, setSelectedMode] = useState(null);
 
-  // ---- HANDLERS (your existing) ----
+  // HANDLErs
   const handleSubmit = async (mode) => {
     setLoadingMode(mode);
     setError("");
@@ -78,7 +79,7 @@ function App() {
     return children;
   }
 
-  // ---- MAIN UI (your existing UI + Logout button) ----
+  // ---- MAIN UI ----
   const MainUI = () => (
     <Container className={`mt-5 ${darkMode ? "dark-mode" : ""}`}>
       <div className="qa-section">
@@ -112,16 +113,27 @@ function App() {
       <h2 className="mb-4 text-center">QA-Buddy-Jojo</h2>
 
       {/* 🎟️ JIRA Ticket Fetch */}
-      <Form.Group className="mb-3">
+      <Form.Group className="mb-3"onSubmit={(e) => e.preventDefault()}>
         <Form.Label>🎟️ Enter JIRA Ticket ID</Form.Label>
         <div className="d-flex gap-2">
           <Form.Control
             type="text"
             placeholder="e.g. SCRUM-1"
             value={ticketId}
-            onChange={(e) => setTicketId(e.target.value)}
+           autoComplete="off"
+           onKeyDown={(e) => {
+           if (e.key === "Enter") {
+           e.preventDefault();
+           e.stopPropagation();
+    }
+  }}
+  onChange={(e) => setTicketId(e.target.value)}
           />
-          <Button variant="warning" onClick={handleFetchJira} disabled={loadingMode !== null}>
+          <Button type="button" variant="warning" onClick={(e) => {        
+        e.preventDefault();
+        handleFetchJira();
+      }}
+      disabled={loadingMode !== null}>
             Fetch from JIRA
           </Button>
         </div>
@@ -140,23 +152,23 @@ function App() {
         </Form.Group>
 
         <div className="d-flex justify-content-center gap-3">
-          <Button variant="primary" onClick={() => handleSubmit("manual")} disabled={loadingMode !== null}>
+          <Button type="button" variant="primary" onClick={() => handleSubmit("manual")} disabled={loadingMode !== null}>
             {loadingMode === "manual" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Manual Test Cases"}
           </Button>
 
-          <Button variant="success" onClick={() => handleSubmit("automation")} disabled={loadingMode !== null}>
+          <Button type="button" variant="success" onClick={() => handleSubmit("automation")} disabled={loadingMode !== null}>
             {loadingMode === "automation" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Playwright Script"}
           </Button>
 
-          <Button variant="warning" onClick={() => handleSubmit("gherkin")} disabled={loadingMode !== null}>
+          <Button type="button" variant="warning" onClick={() => handleSubmit("gherkin")} disabled={loadingMode !== null}>
             {loadingMode === "gherkin" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Gherkin Test Cases"}
           </Button>
 
-          <Button variant="dark" onClick={() => handleSubmit("java")} disabled={loadingMode !== null}>
+          <Button type="button" variant="dark" onClick={() => handleSubmit("java")} disabled={loadingMode !== null}>
             {loadingMode === "java" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Java Selenium Script"}
           </Button>
 
-          <Button variant="dark" onClick={() => handleSubmit("appium")} disabled={loadingMode !== null}>
+          <Button type="button" variant="dark" onClick={() => handleSubmit("appium")} disabled={loadingMode !== null}>
             {loadingMode === "appium" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Appium Code"}
           </Button>
         </div>
@@ -208,15 +220,15 @@ function App() {
       }
     />
 
-    {/* Coming soon - Protected */}
+
     <Route
-      path="/coming-soon"
-      element={
-        <ProtectedRoute>
-          <ComingSoon />
-        </ProtectedRoute>
-      }
-    />
+  path="/po"
+  element={
+    <ProtectedRoute>
+      <PO />
+    </ProtectedRoute>
+  }
+/>
 
     {/* Fallback */}
     <Route path="*" element={<Navigate to="/auth" replace />} />
