@@ -1,0 +1,12 @@
+[
+  {
+    "name": "jojo bhai",
+    "email": "jojo@test.com",
+    "passwordHash": "$2b$10$ue3RbQifaN5QfY469Kor2.GgJN5lfchEmnKPIb8iABtrbRhwDY46q"
+  },
+  {
+    "name": "u",
+    "email": "test@test.com",
+    "passwordHash": "$2b$10$zSzPaR7Q4l3xtmXn2OrUB.sajGzaw7xENSjtMqS1Bal/3GHUQHVlW"
+  }
+]

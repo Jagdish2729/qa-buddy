@@ -7,11 +7,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const generateTestCases = require("./openaiService");
 const { getJiraTicketDetails } = require("./jiraService"); //  JIRA service import
+const poRoutes = require("./poRoutes");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
+app.use("/po", poRoutes);
 
 // Route for generating test cases
 app.post("/generate", async (req, res) => {
