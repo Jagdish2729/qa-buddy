@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const generateTestCases = require("./openaiService"); // reuse LLM client/prompt
+const { generateWithOpenRouter } = require("./openaiService"); // ✅
+
 
 // Button 1 — AC & description from one-liner
 router.post("/generate-ac", async (req, res) => {
@@ -10,14 +11,24 @@ router.post("/generate-ac", async (req, res) => {
       return res.status(400).json({ message: "oneLiner required" });
     }
     const prompt = `
-You are a Product Owner. From this one-liner, write:
-1) A clear User Story (As a <user>, I want..., So that...)
-2) A detailed Description (business context)
-3) Acceptance Criteria (bullet or numbered)
+You are a Product Owner assistant.
+
+TASK:
+From the following single-line idea, produce:
+1) A concise User Story in standard "As a <role>, I want <capability> so that <benefit>" format.
+2) Acceptance Criteria ONLY in Given/When/Then bullet points.
+
+STRICT RULES:
+- Do NOT produce test cases, tables, or code.
+- Do NOT include any "Test Cases" section or IDs.
+- Output must be plain text, no Markdown tables.
+- Start with "User Story:" then a single line.
+- Then a heading "Acceptance Criteria:" followed by bullet points.
+- Keep it focused and unambiguous.
 
 One-liner: ${oneLiner}
     `;
-    const result = await generateTestCases(prompt, "manual"); // reuse LLM call; mode doesn't matter here
+    const result = await generateWithOpenRouter(prompt, { max_tokens: 800, temperature: 0.2 });
     return res.json({ result });
   } catch (e) {
     console.error(e);

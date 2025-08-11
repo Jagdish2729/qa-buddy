@@ -5,7 +5,7 @@ const authRoutes = require("./authRoutes");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const generateTestCases = require("./openaiService");
+const { generateTestCases } = require("./openaiService");
 const { getJiraTicketDetails } = require("./jiraService"); //  JIRA service import
 const poRoutes = require("./poRoutes");
 

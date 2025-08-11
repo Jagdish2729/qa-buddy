@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, Card, Button, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 
-const API = "http://localhost:3000";
+const API = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
 export default function PO() {
   const [oneLiner, setOneLiner] = useState("");
@@ -70,7 +70,7 @@ export default function PO() {
             onClick={handleGenerateAC}
             disabled={loading !== null}
           >
-            {loading === "ac" ? <Spinner size="sm" /> : "Generate AC & Description"}
+            {loading === "ac" ? <Spinner size="sm" animation="border" /> : "Generate AC & Description"}
           </Button>
         </Card.Body>
       </Card>
@@ -80,62 +80,73 @@ export default function PO() {
           <Card className="shadow-sm">
             <Card.Body>
               <h5>Team Grooming (emails + AI board)</h5>
-              <p className="text-muted small mb-3">Creates agenda, assigns owners, sends mail (stub), and drafts a grooming board.</p>
+              <p className="text-muted small mb-3">
+                Creates agenda, assigns owners, sends mail (stub), and drafts a grooming board.
+              </p>
               <Button
                 type="button"
                 variant="warning"
                 onClick={handleGrooming}
                 disabled={loading !== null}
               >
-                {loading === "grooming" ? <Spinner size="sm" /> : "Create Grooming Plan"}
+                {loading === "grooming" ? <Spinner size="sm" animation="border" /> : "Create Grooming Plan"}
               </Button>
             </Card.Body>
           </Card>
         </Col>
+
         <Col md={6}>
           <Card className="shadow-sm">
             <Card.Body>
               <h5>Team Planning (emails + AI board)</h5>
-              <p className="text-muted small mb-3">Drafts sprint goals, backlog order, capacity hints; sends mail (stub).</p>
+              <p className="text-muted small mb-3">
+                Drafts sprint goals, backlog order, capacity hints; sends mail (stub).
+              </p>
               <Button
                 type="button"
                 variant="success"
                 onClick={handlePlanning}
                 disabled={loading !== null}
               >
-                {loading === "planning" ? <Spinner size="sm" /> : "Create Planning Plan"}
+                {loading === "planning" ? <Spinner size="sm" animation="border" /> : "Create Planning Plan"}
               </Button>
             </Card.Body>
           </Card>
         </Col>
+
         <Col md={6}>
           <Card className="shadow-sm">
             <Card.Body>
               <h5>Team Retro Board</h5>
-              <p className="text-muted small mb-3">Generates a retro template with sections (Went well, Didn’t go well, Action items).</p>
+              <p className="text-muted small mb-3">
+                Generates a retro template with sections (Went well, Didn’t go well, Action items).
+              </p>
               <Button
                 type="button"
                 variant="dark"
                 onClick={handleRetro}
                 disabled={loading !== null}
               >
-                {loading === "retro" ? <Spinner size="sm" /> : "Generate Retro Board"}
+                {loading === "retro" ? <Spinner size="sm" animation="border" /> : "Generate Retro Board"}
               </Button>
             </Card.Body>
           </Card>
         </Col>
+
         <Col md={6}>
           <Card className="shadow-sm">
             <Card.Body>
               <h5>Team Capacity Board</h5>
-              <p className="text-muted small mb-3">Creates a capacity table (member, velocity, leaves, effective capacity).</p>
+              <p className="text-muted small mb-3">
+                Creates a capacity table (member, velocity, leaves, effective capacity).
+              </p>
               <Button
                 type="button"
                 variant="secondary"
                 onClick={handleCapacity}
                 disabled={loading !== null}
               >
-                {loading === "capacity" ? <Spinner size="sm" /> : "Generate Capacity Board"}
+                {loading === "capacity" ? <Spinner size="sm" animation="border" /> : "Generate Capacity Board"}
               </Button>
             </Card.Body>
           </Card>
@@ -151,4 +162,3 @@ export default function PO() {
     </Container>
   );
 }
-export default function PO() 
