@@ -3,84 +3,26 @@ import { Container, Form, Button, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
 import "./App.css";
 import Home from "./pages/Home";
-import ComingSoon from "./pages/Comingsoon";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Auth from "./pages/Auth";
-import { isLoggedIn, logout } from "./utils/auth";
 import PO from "./pages/PO";
+import { Routes, Route } from "react-router-dom";
 
-function App() {
-  useEffect(() => {
-    document.title = "QA Buddy Helper";
-  }, []);
 
-  // ---- STATE
-  const [jiraText, setJiraText] = useState("");
-  const [response, setResponse] = useState("");
-  const [error, setError] = useState("");
-  const [loadingMode, setLoadingMode] = useState(null); // 'manual' | 'automation' | 'gherkin' | 'java' | 'appium'
-  const [ticketId, setTicketId] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
-  const [selectedMode, setSelectedMode] = useState(null);
-
-  // HANDLErs
-  const handleSubmit = async (mode) => {
-    setLoadingMode(mode);
-    setError("");
-    setSelectedMode(mode);
-    setResponse("");
-
-    try {
-      const res = await axios.post("http://localhost:3000/generate", {
-        jiraText,
-        mode,
-      });
-      setResponse(res.data.result);
-    } catch (err) {
-      setError("❌ Error generating test cases. Check server.");
-      console.error("❌ Axios error:", err);
-    } finally {
-      setLoadingMode(null);
-    }
-  };
-
-  const handleFetchJira = async () => {
-    try {
-      const res = await axios.post("http://localhost:3000/jira-ticket", {
-        ticketId: ticketId,
-      });
-    setJiraText(res.data.jiraText);
-      setError("");
-    } catch (err) {
-      setError("❌ Failed to fetch JIRA ticket.");
-      console.error("❌ JIRA fetch error", err);
-    }
-  };
-
-  const handleDownloadCSV = () => {
-    const rows = response
-      .split("\n")
-      .map((line) => line.split("|").map((cell) => cell.trim()));
-
-    const csvContent = rows.map((e) => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "test_cases.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // ---- PROTECTED ROUTE ----
-  function ProtectedRoute({ children }) {
-    if (!isLoggedIn()) return <Navigate to="/auth" replace />;
-    return children;
-  }
-
-  // ---- MAIN UI ----
-  const MainUI = () => (
+function MainUI({
+  darkMode,
+  setDarkMode,
+  ticketId,
+  setTicketId,
+  jiraText,
+  setJiraText,
+  loadingMode,
+  selectedMode,
+  response,
+  error,
+  handleFetchJira,
+  handleSubmit,
+  handleDownloadCSV,
+}) {
+  return (
     <Container className={`mt-5 ${darkMode ? "dark-mode" : ""}`}>
       <div className="qa-section">
         <div className="qa-links">
@@ -92,7 +34,6 @@ function App() {
         </div>
       </div>
 
-      {/* Dark Mode + Logout */}
       <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
         <Form.Check
           type="switch"
@@ -101,45 +42,41 @@ function App() {
           checked={darkMode}
           onChange={() => setDarkMode(!darkMode)}
         />
-        <Button
-          size="sm"
-          variant="outline-danger"
-          onClick={() => { logout(); window.location.href = "/auth"; }}
-        >
-          Logout
-        </Button>
       </div>
 
       <h2 className="mb-4 text-center">QA-Buddy-Jojo</h2>
 
-      {/* 🎟️ JIRA Ticket Fetch */}
-      <Form.Group className="mb-3"onSubmit={(e) => e.preventDefault()}>
-        <Form.Label>🎟️ Enter JIRA Ticket ID</Form.Label>
-        <div className="d-flex gap-2">
-          <Form.Control
-            type="text"
-            placeholder="e.g. SCRUM-1"
-            value={ticketId}
-           autoComplete="off"
-           onKeyDown={(e) => {
-           if (e.key === "Enter") {
-           e.preventDefault();
-           e.stopPropagation();
-    }
-  }}
-  onChange={(e) => setTicketId(e.target.value)}
-          />
-          <Button type="button" variant="warning" onClick={(e) => {        
-        e.preventDefault();
-        handleFetchJira();
-      }}
-      disabled={loadingMode !== null}>
-            Fetch from JIRA
-          </Button>
-        </div>
-      </Form.Group>
+      {/* SINGLE FORM: prevent default submit once, all buttons type="button" */}
+      <Form onSubmit={(e) => e.preventDefault()}>
+        {/* 🎟️ JIRA Ticket Fetch */}
+        <Form.Group className="mb-3">
+          <Form.Label>🎟️ Enter JIRA Ticket ID</Form.Label>
+          <div className="d-flex gap-2">
+            <Form.Control
+              type="text"
+              placeholder="e.g. SCRUM-1"
+              value={ticketId}
+              autoComplete="off"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+              onChange={(e) => setTicketId(e.target.value)}
+            />
+            <Button
+              type="button"
+              variant="warning"
+              onClick={handleFetchJira}
+              disabled={loadingMode !== null}
+            >
+              Fetch from JIRA
+            </Button>
+          </div>
+        </Form.Group>
 
-      <Form>
+        {/* 📝 JIRA Acceptance Criteria */}
         <Form.Group className="mb-3">
           <Form.Label>📝 JIRA Acceptance Criteria</Form.Label>
           <Form.Control
@@ -151,7 +88,8 @@ function App() {
           />
         </Form.Group>
 
-        <div className="d-flex justify-content-center gap-3">
+        {/* Action buttons */}
+        <div className="d-flex justify-content-center gap-3 flex-wrap">
           <Button type="button" variant="primary" onClick={() => handleSubmit("manual")} disabled={loadingMode !== null}>
             {loadingMode === "manual" ? (<><Spinner as="span" animation="border" size="sm" /> Generating...</>) : "Generate Manual Test Cases"}
           </Button>
@@ -190,51 +128,96 @@ function App() {
       )}
     </Container>
   );
+}
+/** ----- END MAINUI ----- */
 
-  // ---- ROUTES ----
+function App() {
+  useEffect(() => {
+    document.title = "QA Buddy Helper";
+  }, []);
+
+  const [jiraText, setJiraText] = useState("");
+  const [response, setResponse] = useState("");
+  const [error, setError] = useState("");
+  const [loadingMode, setLoadingMode] = useState(null);
+  const [ticketId, setTicketId] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
+  const [selectedMode, setSelectedMode] = useState(null);
+
+  const handleSubmit = async (mode) => {
+    setLoadingMode(mode);
+    setError("");
+    setSelectedMode(mode);
+    setResponse("");
+
+    try {
+      const res = await axios.post("http://localhost:3000/generate", {
+        jiraText,
+        mode,
+      });
+      setResponse(res.data.result);
+    } catch (err) {
+      setError("❌ Error generating test cases. Check server.");
+      console.error("❌ Axios error:", err);
+    } finally {
+      setLoadingMode(null);
+    }
+  };
+
+  const handleFetchJira = async () => {
+    try {
+      const res = await axios.post("http://localhost:3000/jira-ticket", {
+        ticketId: ticketId,
+      });
+      setJiraText(res.data.jiraText);
+      setError("");
+    } catch (err) {
+      setError("❌ Failed to fetch JIRA ticket.");
+      console.error("❌ JIRA fetch error", err);
+    }
+  };
+
+  const handleDownloadCSV = () => {
+    const rows = response
+      .split("\n")
+      .map((line) => line.split("|").map((cell) => cell.trim()));
+    const csvContent = rows.map((e) => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "test_cases.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-  <Routes>
-    {/* Always land on login */}
-    <Route path="/" element={<Navigate to="/auth" replace />} />
-
-    {/* Auth page (open) */}
-    <Route path="/auth" element={<Auth />} />
-
-    {/* Home (roles) - Protected */}
-    <Route
-      path="/home"
-      element={
-        <ProtectedRoute>
-          <Home />
-        </ProtectedRoute>
-      }
-    />
-
-    {/* QA Buddy - Protected */}
-    <Route
-      path="/app"
-      element={
-        <ProtectedRoute>
-          <MainUI />
-        </ProtectedRoute>
-      }
-    />
-
-
-    <Route
-  path="/po"
-  element={
-    <ProtectedRoute>
-      <PO />
-    </ProtectedRoute>
-  }
-/>
-
-    {/* Fallback */}
-    <Route path="*" element={<Navigate to="/auth" replace />} />
-  </Routes>
-);
-
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/app"
+        element={
+          <MainUI
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            ticketId={ticketId}
+            setTicketId={setTicketId}
+            jiraText={jiraText}
+            setJiraText={setJiraText}
+            loadingMode={loadingMode}
+            selectedMode={selectedMode}
+            response={response}
+            error={error}
+            handleFetchJira={handleFetchJira}
+            handleSubmit={handleSubmit}
+            handleDownloadCSV={handleDownloadCSV}
+          />
+        }
+      />
+      <Route path="/po" element={<PO />} />
+    </Routes>
+  );
 }
 
 export default App;

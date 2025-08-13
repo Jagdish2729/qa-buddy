@@ -134,6 +134,19 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 10px 24px rgba(0,0,0,0.08);
 }
+.home-hero {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  min-height: calc(100vh - 56px); /* minus navbar height */
+}
+
+.role-card {
+  border-radius: 14px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+}
 
 
 

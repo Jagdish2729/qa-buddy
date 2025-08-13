@@ -1,7 +1,7 @@
 require("dotenv").config();
 console.log("🔐 OPENROUTER_API_KEY present?", !!process.env.OPENROUTER_API_KEY);
 console.log("🌐 OPENROUTER_BASE_URL:", process.env.OPENROUTER_BASE_URL);
-const authRoutes = require("./authRoutes");
+// const authRoutes = require("./authRoutes");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -12,7 +12,7 @@ const poRoutes = require("./poRoutes");
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use("/auth", authRoutes);
+// app.use("/auth", authRoutes);
 app.use("/po", poRoutes);
 
 // Route for generating test cases

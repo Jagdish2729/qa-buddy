@@ -1,0 +1,91 @@
+/* Page background */
+.landing-bg {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #dff3ff 0%, #eaf7ff 100%);
+}
+
+/* Navbar */
+.landing-nav {
+  background: transparent;
+  padding: 14px 0;
+}
+.brand {
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #0b3866;
+}
+.brand .genie-emoji { margin-right: 8px; }
+
+/* Hero */
+.hero {
+  padding: 64px 0 32px;
+}
+.hero-title {
+  color: #0b3866;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  font-size: clamp(2rem, 3.2vw + 1rem, 3.2rem);
+}
+.hero-sub {
+  color: #275a86;
+  font-size: 1.1rem;
+  margin-top: 14px;
+  max-width: 48ch;
+}
+.cta-wrap { margin-top: 24px; }
+.cta-btn {
+  background: #3b82f6;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(59,130,246,.25);
+}
+.cta-btn:hover { background: #2563eb; }
+
+/* Genie illustration placeholder */
+.genie-blob {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+  border-radius: 30% 70% 60% 40% / 40% 30% 70% 60%;
+  background: #c9e8ff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 30px rgba(11,56,102,.15);
+}
+.genie-emoji.big { font-size: 90px; }
+.sparkle {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  color: #ffb300;
+}
+
+/* Features */
+.features { padding: 32px 0 64px; }
+.feature-card {
+  border: none;
+  border-radius: 16px;
+  padding: 8px 6px;
+  box-shadow: 0 8px 24px rgba(11,56,102,.08);
+}
+.feature-card .icon {
+  font-size: 32px;
+  background: #eef6ff;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.f-title {
+  font-weight: 700;
+  color: #0b3866;
+}
+.f-text {
+  color: #366a9a;
+  margin: 0;
+}
