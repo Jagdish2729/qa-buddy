@@ -1,8 +1,8 @@
 | Test Case ID | Description | Steps | Expected Result | Priority |
 |--------------|-------------|-------|-----------------|----------|
-| TC001 | Verify user registration | 1) Navigate to the registration page, 2) Enter valid user details, 3) Click on the register button | User should be successfully registered and redirected to the login page | High |
-| TC002 | Verify login functionality | 1) Navigate to the login page, 2) Enter valid credentials, 3) Click on the login button | User should be successfully logged in and redirected to the dashboard | High |
-| TC003 | Verify forgot password functionality | 1) Navigate to the login page, 2) Click on the forgot password link, 3) Enter email address, 4) Click on the submit button, 5) Check email for password reset link | User should receive a password reset email | Medium |
-| TC004 | Verify password reset functionality | 1) Click on the password reset link in the email, 2) Enter new password, 3) Confirm new password, 4) Click on the reset password button | User's password should be successfully reset | Medium |
-| TC005 | Verify user logout functionality | 1) Navigate to the dashboard, 2) Click on the logout button | User should be successfully logged out and redirected to the login page | Medium |
-| TC006 | Verify search functionality | 1) Navigate to the search page, 2) Enter a valid search term, 3) Click on the search button | Search results matching the entered term should be displayed | Low |
+| TC001 | Valid login with correct credentials | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter valid password<br>4) Click on the login button | Redirected to the dashboard | High |
+| TC002 | Valid login with correct credentials and "Remember Me" checked | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter valid password<br>4) Check "Remember Me"<br>5) Click on the login button | Redirected to the dashboard and "Remember Me" functionality is enabled | High |
+| TC003 | Incorrect password | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter an invalid password<br>4) Click on the login button | Error message: "Incorrect password" displayed | High |
+| TC004 | Empty username | 1) Navigate to the login page<br>2) Leave the username field blank<br>3) Enter a valid password<br>4) Click on the login button | Validation error for the username field | High |
+| TC005 | Empty password | 1) Navigate to the login page<br>2) Enter a valid username<br>3) Leave the password field blank<br>4) Click on the login button | Validation error for the password field | High |
+| TC006 | Login with blank fields | 1) Navigate to the login page<br>2) Leave both the username and password fields blank<br>3) Click on the login button | Validation errors for both the username and password fields | High |

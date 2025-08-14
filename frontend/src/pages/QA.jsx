@@ -1,228 +1,303 @@
 import { useEffect, useState } from "react";
-import { Container, Form, Button, Spinner, Alert } from "react-bootstrap";
+import { Container, Row, Col, Card, Form, Button, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
-import "../styles/App.css"; 
+import AppNavbar from "../components/Navbar";
+
+const API = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
 export default function QA() {
-  useEffect(() => {
-    document.title = "AgileGenieAI";
-  }, []);
 
+  useEffect(() => { document.title = "AgileGenieAI"; }, []);
+
+  // state
+  const [ticketId, setTicketId] = useState("");
   const [jiraText, setJiraText] = useState("");
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
   const [loadingMode, setLoadingMode] = useState(null);
-  const [ticketId, setTicketId] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
   const [selectedMode, setSelectedMode] = useState(null);
+  const [files, setFiles] = useState([]);
 
-  const handleSubmit = async (mode) => {
+  // NEW: copy button label state
+  const [copyLabel, setCopyLabel] = useState("Copy");
+
+  // theme tokens
+  const brand = { bg: "#E6F6FF", ink: "#0B4A6E", sub: "#2B6C8C", primary: "#2B7DEA", chip: "#8FD3FF" };
+
+  // handlers
+  const callGenerate = async (mode) => {
     setLoadingMode(mode);
-    setError("");
     setSelectedMode(mode);
+    setError("");
     setResponse("");
 
     try {
-      const res = await axios.post("http://localhost:3000/generate", {
-        jiraText,
-        mode,
+      // Build multipart body
+      const fd = new FormData();
+      fd.append("mode", mode);
+      fd.append("ticketId", ticketId);   // optional: if backend needs it
+      fd.append("jiraText", jiraText || "");
+
+      // Append all selected files
+      files.forEach((f) => {
+        fd.append("files", f, f.name); // 'files' should match backend field name
       });
-      setResponse(res.data.result);
-    } catch (err) {
-      setError("❌ Error generating test cases. Check server.");
-      console.error("❌ Axios error:", err);
+
+      const { data } = await axios.post(`${API}/generate`, fd, {
+        headers: { /* axios will set multipart boundary automatically */ },
+        onUploadProgress: (e) => {
+          const pct = Math.round((e.loaded * 100) / (e.total || 1));
+          console.log("upload %", pct);
+        },
+      });
+
+      setResponse(data?.result || "");
+      // reset copy label when new response arrives
+      setCopyLabel("Copy");
+    } catch (e) {
+      console.error(e);
+      setError(e?.response?.data?.message || "❌ Error generating output. Please check server.");
     } finally {
       setLoadingMode(null);
     }
   };
 
   const handleFetchJira = async () => {
+    setError("");
     try {
-      const res = await axios.post("http://localhost:3000/jira-ticket", {
-        ticketId,
-      });
-      setJiraText(res.data.jiraText);
-      setError("");
-    } catch (err) {
+      const { data } = await axios.post(`${API}/jira-ticket`, { ticketId });
+      setJiraText(data?.jiraText || "");
+    } catch (e) {
+      console.error(e);
       setError("❌ Failed to fetch JIRA ticket.");
-      console.error("❌ JIRA fetch error", err);
     }
   };
 
-  const handleDownloadCSV = () => {
-    const rows = response
+  // UPDATED: Copy with label flip to "Copied!" then back
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(response || "");
+      setCopyLabel("Copied!");
+      setTimeout(() => setCopyLabel("Copy"), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleExportCSV = () => {
+    const rows = (response || "")
       .split("\n")
       .map((line) => line.split("|").map((cell) => cell.trim()));
-    const csvContent = rows.map((e) => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
+    const csv = rows.map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.setAttribute("download", "test_cases.csv");
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
+  };
+
+  const handleFilePick = (e) => {
+    const picked = Array.from(e.target.files || []);
+    setFiles(picked);
   };
 
   return (
-    <Container className={`mt-5 ${darkMode ? "dark-mode" : ""}`}>
-      <div className="qa-section">
-        <div className="qa-links">
-          <a href="https://www.guru99.com/manual-testing.html" target="_blank" rel="noopener noreferrer">Manual</a>
-          <a href="https://playwright.dev/docs/intro" target="_blank" rel="noopener noreferrer">Playwright</a>
-          <a href="https://www.postman.com/api-platform" target="_blank" rel="noopener noreferrer">API</a>
-          <a href="https://www.w3schools.com/sql/" target="_blank" rel="noopener noreferrer">SQL</a>
-          <a href="https://testautomationu.applitools.com/" target="_blank" rel="noopener noreferrer">Tools</a>
-        </div>
-      </div>
+    <div style={{ background: brand.bg, minHeight: "100vh" }}>
+      <AppNavbar />
 
-      <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
-        <Form.Check
-          type="switch"
-          id="dark-mode-switch"
-          label={darkMode ? "🌙 Dark Mode" : "☀️ Light Mode"}
-          checked={darkMode}
-          onChange={() => setDarkMode(!darkMode)}
-        />
-      </div>
+      <Container className="py-4 py-md-5">
+        {/* Title */}
+        <Row>
+          <Col>
+            <h1 style={{ fontWeight: 800, color: brand.ink, lineHeight: 1.1, fontSize: "clamp(26px,4.5vw,42px)" }}>
+              QA Buddy – Role Workspace
+            </h1>
+            <p style={{ color: brand.sub, marginTop: 6 }}>
+              Generate test cases, automation scripts & assets with a guided flow.
+            </p>
+          </Col>
+        </Row>
 
-      <h2 className="mb-4 text-center">QA-Buddy-Jojo</h2>
+        {/* Two columns: Inputs/Actions (left) — Output (right) */}
+        <Row className="g-4 mt-1">
+          {/* LEFT: Inputs + Actions */}
+          <Col lg={8}>
+            {/* Inputs */}
+            <Card className="shadow-sm border-0 mb-3" style={{ borderRadius: 16 }}>
+              <Card.Body>
+                <h5 style={{ color: brand.ink, fontWeight: 800, marginBottom: 12 }}>Inputs</h5>
 
-      {/* SINGLE FORM wrapper (prevent default submit) */}
-      <Form onSubmit={(e) => e.preventDefault()}>
-        {/* 🎟️ JIRA Ticket Fetch */}
-        <Form.Group className="mb-3">
-          <Form.Label>🎟️ Enter JIRA Ticket ID</Form.Label>
-          <div className="d-flex gap-2">
-            <Form.Control
-              type="text"
-              placeholder="e.g. SCRUM-1"
-              value={ticketId}
-              autoComplete="off"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }}
-              onChange={(e) => setTicketId(e.target.value)}
-            />
-            <Button
-              type="button"
-              variant="warning"
-              onClick={handleFetchJira}
-              disabled={loadingMode !== null}
-            >
-              Fetch from JIRA
-            </Button>
-          </div>
-        </Form.Group>
+                {/* JIRA Ticket */}
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ color: brand.ink, fontWeight: 700 }}>
+                    🎟️ Enter JIRA Ticket ID
+                  </Form.Label>
+                  <div className="d-flex gap-2">
+                    <Form.Control
+                      placeholder="e.g. SCRUM-1"
+                      value={ticketId}
+                      onChange={(e) => setTicketId(e.target.value)}
+                    />
+                    <Button
+                      type="button"
+                      variant="warning"
+                      style={{ borderRadius: 12, fontWeight: 700 }}
+                      onClick={handleFetchJira}
+                      disabled={loadingMode !== null}
+                    >
+                      Fetch from JIRA
+                    </Button>
+                  </div>
+                </Form.Group>
 
-        {/* 📝 JIRA Acceptance Criteria */}
-        <Form.Group className="mb-3">
-          <Form.Label>📝 JIRA Acceptance Criteria</Form.Label>
-        <Form.Control
-            as="textarea"
-            rows={6}
-            value={jiraText}
-            onChange={(e) => setJiraText(e.target.value)}
-            placeholder="e.g. Given I am on the login page..."
-          />
-        </Form.Group>
+                {/* Acceptance Criteria */}
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ color: brand.ink, fontWeight: 700 }}>
+                    📝 JIRA Acceptance Criteria
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={6}
+                    placeholder="e.g. Given I am on the login page..."
+                    value={jiraText}
+                    onChange={(e) => setJiraText(e.target.value)}
+                  />
+                </Form.Group>
 
-        {/* Action buttons */}
-        <div className="d-flex justify-content-center gap-3 flex-wrap">
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => handleSubmit("manual")}
-            disabled={loadingMode !== null}
-          >
-            {loadingMode === "manual" ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" /> Generating...
-              </>
-            ) : (
-              "Generate Manual Test Cases"
-            )}
-          </Button>
+                {/* Upload Screenshot/Figma (small button) */}
+                <Form.Group>
+                  <Form.Label style={{ color: brand.ink, fontWeight: 700 }}>
+                    🖼️ Upload Screenshot / Figma (optional)
+                  </Form.Label>
+                  <div className="d-flex align-items-center gap-2">
+                    <Form.Control
+                      type="file"
+                      multiple
+                      accept=".png,.jpg,.jpeg,.pdf,.fig"
+                      onChange={handleFilePick}
+                      style={{ maxWidth: 320 }}
+                    />
+                    {files.length > 0 && (
+                      <small style={{ color: brand.sub }}>{files.length} file(s) selected</small>
+                    )}
+                  </div>
+                </Form.Group>
+              </Card.Body>
+            </Card>
 
-          <Button
-            type="button"
-            variant="success"
-            onClick={() => handleSubmit("automation")}
-            disabled={loadingMode !== null}
-          >
-            {loadingMode === "automation" ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" /> Generating...
-              </>
-            ) : (
-              "Generate Playwright Script"
-            )}
-          </Button>
+            {/* Generate Buttons */}
+            <Card className="shadow-sm border-0" style={{ borderRadius: 16 }}>
+              <Card.Body>
+                <h5 style={{ color: brand.ink, fontWeight: 800, marginBottom: 12 }}>Generate</h5>
+                <div className="d-flex flex-wrap gap-3">
+                  <Button
+                    type="button"
+                    style={{ background: brand.primary, borderColor: brand.primary, borderRadius: 12, fontWeight: 700 }}
+                    onClick={() => callGenerate("manual")}
+                    disabled={loadingMode !== null}
+                  >
+                    {loadingMode === "manual" ? <><Spinner size="sm" animation="border" /> Generating…</> : "Generate Manual Test Cases"}
+                  </Button>
 
-          <Button
-            type="button"
-            variant="warning"
-            onClick={() => handleSubmit("gherkin")}
-            disabled={loadingMode !== null}
-          >
-            {loadingMode === "gherkin" ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" /> Generating...
-              </>
-            ) : (
-              "Generate Gherkin Test Cases"
-            )}
-          </Button>
+                  <Button
+                    type="button"
+                    variant="success"
+                    style={{ borderRadius: 12, fontWeight: 700 }}
+                    onClick={() => callGenerate("automation")}
+                    disabled={loadingMode !== null}
+                  >
+                    {loadingMode === "automation" ? <><Spinner size="sm" animation="border" /> Generating…</> : "Generate Playwright Script"}
+                  </Button>
 
-          <Button
-            type="button"
-            variant="dark"
-            onClick={() => handleSubmit("java")}
-            disabled={loadingMode !== null}
-          >
-            {loadingMode === "java" ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" /> Generating...
-              </>
-            ) : (
-              "Generate Java Selenium Script"
-            )}
-          </Button>
+                  <Button
+                    type="button"
+                    variant="warning"
+                    style={{ borderRadius: 12, fontWeight: 700 }}
+                    onClick={() => callGenerate("gherkin")}
+                    disabled={loadingMode !== null}
+                  >
+                    {loadingMode === "gherkin" ? <><Spinner size="sm" animation="border" /> Generating…</> : "Generate Gherkin Test Cases"}
+                  </Button>
 
-          <Button
-            type="button"
-            variant="dark"
-            onClick={() => handleSubmit("appium")}
-            disabled={loadingMode !== null}
-          >
-            {loadingMode === "appium" ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" /> Generating...
-              </>
-            ) : (
-              "Generate Appium Code"
-            )}
-          </Button>
-        </div>
-      </Form>
+                  <Button
+                    type="button"
+                    variant="dark"
+                    style={{ borderRadius: 12, fontWeight: 700 }}
+                    onClick={() => callGenerate("java")}
+                    disabled={loadingMode !== null}
+                  >
+                    {loadingMode === "java" ? <><Spinner size="sm" animation="border" /> Generating…</> : "Generate Java Selenium Script"}
+                  </Button>
 
-      {error && <Alert variant="danger" className="mt-4">{error}</Alert>}
+                  <Button
+                    type="button"
+                    variant="dark"
+                    style={{ borderRadius: 12, fontWeight: 700 }}
+                    onClick={() => callGenerate("appium")}
+                    disabled={loadingMode !== null}
+                  >
+                    {loadingMode === "appium" ? <><Spinner size="sm" animation="border" /> Generating…</> : "Generate Appium Code"}
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
 
-      {response && (
-        <>
-          <div className="result-box mt-4">
-            <pre><code>{response}</code></pre>
-          </div>
-          {selectedMode === "manual" && (
-            <div className="d-flex justify-content-center mt-3">
-              <Button variant="info" onClick={handleDownloadCSV}>📥 Export to CSV</Button>
-            </div>
-          )}
-        </>
-      )}
-    </Container>
+            {/* Errors below actions (if any) */}
+            {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+          </Col>
+
+          {/* RIGHT: Output panel */}
+          <Col lg={4}>
+            <Card className="shadow-sm border-0 sticky-top" style={{ borderRadius: 16, top: 90 }}>
+              <Card.Body>
+                <div className="d-flex align-items-center justify-content-between">
+                  <h5 style={{ color: brand.ink, fontWeight: 800, marginBottom: 0 }}>Output</h5>
+                  <div className="d-flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      style={{ background: brand.primary, borderColor: brand.primary, borderRadius: 10 }}
+                      onClick={handleExportCSV}
+                      disabled={!response}
+                    >
+                      Export CSV
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="info"
+                      style={{ borderRadius: 10 }}
+                      onClick={handleCopy}
+                      disabled={!response}
+                    >
+                      {copyLabel}
+                    </Button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: 12,
+                    background: "#F9FBFF",
+                    border: "1px solid #DCEBFA",
+                    borderRadius: 12,
+                    padding: 12,
+                    maxHeight: 450,
+                    overflow: "auto",
+                    whiteSpace: "pre-wrap",
+                    color: brand.sub,
+                    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+                    fontSize: 14,
+                  }}
+                >
+                  {response || "Results will appear here after you generate."}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
