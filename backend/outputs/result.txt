@@ -1,8 +1,79 @@
-| Test Case ID | Description | Steps | Expected Result | Priority |
-|--------------|-------------|-------|-----------------|----------|
-| TC001 | Valid login with correct credentials | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter valid password<br>4) Click on the login button | Redirected to the dashboard | High |
-| TC002 | Valid login with correct credentials and "Remember Me" checked | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter valid password<br>4) Check "Remember Me"<br>5) Click on the login button | Redirected to the dashboard and "Remember Me" functionality is enabled | High |
-| TC003 | Incorrect password | 1) Navigate to the login page<br>2) Enter valid username<br>3) Enter an invalid password<br>4) Click on the login button | Error message: "Incorrect password" displayed | High |
-| TC004 | Empty username | 1) Navigate to the login page<br>2) Leave the username field blank<br>3) Enter a valid password<br>4) Click on the login button | Validation error for the username field | High |
-| TC005 | Empty password | 1) Navigate to the login page<br>2) Enter a valid username<br>3) Leave the password field blank<br>4) Click on the login button | Validation error for the password field | High |
-| TC006 | Login with blank fields | 1) Navigate to the login page<br>2) Leave both the username and password fields blank<br>3) Click on the login button | Validation errors for both the username and password fields | High |
+Here's an example of how you could structure your Playwright tests using TypeScript and the Page Object Model (POM) approach for the provided acceptance criteria.
+
+First, let's create a `filters.ts` page object:
+
+```typescript
+// filters.ts
+
+import { Page } from '@playwright/test';
+
+export class FiltersPage {
+  readonly filterOptionLocator = this.locator('filter-option');
+  readonly tooltipLocator = this.locator('.tooltip');
+  readonly selectedFilterLocator = this.locator('.selected-filter');
+
+  constructor(private page: Page) {}
+
+  async hoverFilterOption(filterName: string) {
+    await this.page.waitForSelector(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
+    await this.page.hover(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
+    await this.page.waitForSelector(this.tooltipLocator);
+  }
+
+  async clickFilterOption(filterName: string) {
+    await this.page.click(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
+  }
+
+  async getFilterCount(filterName: string) {
+    return this.page.locator(this.filterOptionLocator(`[data-filter-name="${filterName}"]`)).getAttribute('data-filter-count');
+  }
+
+  // Add more methods as needed...
+}
+```
+
+Next, let's create a `filters.spec.ts` test file:
+
+```typescript
+// filters.spec.ts
+
+import { test, expect } from '@playwright/test';
+import { FiltersPage } from './filters';
+
+let filtersPage: FiltersPage;
+
+test.beforeEach(async ({ page }) => {
+  filtersPage = new FiltersPage(page);
+  // Navigate to the filters page...
+});
+
+test('Apply single filter', async () => {
+  // ...
+  await filtersPage.hoverFilterOption('Filter1');
+  await filtersPage.clickFilterOption('Filter1');
+  // ...
+});
+
+test('Apply multiple filters', async () => {
+  // ...
+  await filtersPage.hoverFilterOption('Filter1');
+  await filtersPage.clickFilterOption('Filter1');
+  await filtersPage.hoverFilterOption('Filter2');
+  await filtersPage.clickFilterOption('Filter2');
+  // ...
+});
+
+test('Clear all filters', async () => {
+  // ...
+  await filtersPage.clickFilterOption('Filter1'); // Assuming that clicking on a selected filter clears it
+  // ...
+});
+
+// Add more tests as needed...
+```
+
+Make sure to replace the comments with your actual test logic and navigation to the filters page.
+
+This example demonstrates a simple implementation of the Page Object Model (POM) pattern, where we have a `FiltersPage` class that contains locators and methods for interacting with the filters on the page. The test logic is then separated in the `filters.spec.ts` file, which imports the `FiltersPage` class and instantiates it within the `test.beforeEach()` hook.
+
+You can extend this example by adding more methods to the `FiltersPage` class as needed, such as methods for selecting multiple filters, checking the number of matching items, and handling loading indicators, empty lists, and other acceptance criteria.

@@ -8,7 +8,7 @@ const cors = require("cors");
 const multer = require("multer");
 
 const { generateTestCases } = require("./openaiService");
-const { getJiraTicketDetails } = require("./jiraService");
+const { getJiraTicketDetails, createIssue } = require("./jiraService");
 const poRoutes = require("./poRoutes");
 
 const app = express();
@@ -32,7 +32,7 @@ const upload = multer({
 // ----- Routes -----
 app.use("/po", poRoutes);
 
-// ✅ Generate route (now supports multipart: jiraText + mode + files)
+//  Generate route (now supports multipart: jiraText + mode + files)
 app.post("/generate", upload.array("files", 10), async (req, res) => {
   try {
     // NOTE: Multipart me fields req.body me aate hain (strings)
@@ -71,15 +71,52 @@ app.post("/generate", upload.array("files", 10), async (req, res) => {
 
 //  Route to fetch ticket summary + description from JIRA
 app.post("/jira-ticket", async (req, res) => {
-  const { ticketId } = req.body;
-  console.log("🔎 Fetching JIRA ticket:", ticketId);
-
   try {
+    const { ticketId } = req.body;
     const text = await getJiraTicketDetails(ticketId);
     return res.json({ success: true, jiraText: text });
   } catch (error) {
-    console.error("❌ Error in /jira-ticket route:", error.message);
+    console.error("❌ /jira-ticket:", error?.response?.data || error.message);
     return res.status(500).json({ success: false, message: "Failed to fetch JIRA ticket." });
+  }
+});
+
+// Create JIRA ticket (new)
+app.post("/jira/create", async (req, res) => {
+  try {
+    const {
+      projectKey,
+      issueType = "Story",
+      summary,
+      description = "",
+      acceptanceCriteria = [],
+      reporterEmail,
+      reporterAccountId,
+    } = req.body || {};
+
+    if (!summary) return res.status(400).json({ success: false, message: "summary required" });
+    if (!(projectKey || process.env.JIRA_DEFAULT_PROJECT)) {
+      return res.status(400).json({ success: false, message: "projectKey required" });
+    }
+
+    const data = await createIssue({
+      projectKey: projectKey || process.env.JIRA_DEFAULT_PROJECT,
+      issueType,
+      summary,
+      description,
+      acceptanceCriteria,
+      reporterEmail,
+      reporterAccountId,
+    });
+
+    return res.json({ success: true, issueKey: data.key, issueId: data.id });
+  } catch (e) {
+    const rsp = e?.response?.data;
+    console.error("❌ /jira/create:", rsp || e.message);
+    return res.status(500).json({
+      success: false,
+      message: rsp?.errorMessages?.[0] || rsp?.errors || rsp || e.message || "Failed to create Jira ticket.",
+    });
   }
 });
 
