@@ -27,11 +27,11 @@ export default function Feature() {
       title: "Jira Integration",
       text: "Fetch ticket detail by entering the ticket ID.",
     },
-    {
-      icon: "📊",
-      title: "Visual Reports",
-      text: "Pass/fail trends, flaky tests, and test coverage.",
-    },
+    // {
+    //   icon: "📊",
+    //   title: "Visual Reports",
+    //   text: "Pass/fail trends, flaky tests, and test coverage.",
+    // },
   ];
 
   const roles = [
@@ -83,32 +83,42 @@ export default function Feature() {
 
       <Container className="py-4 py-md-5">
         {/* HERO */}
-        { <Row className="align-items-center">
-          <Col>
-            <h1
-              style={{
-                fontWeight: 800,
-                color: brand.ink,
-                lineHeight: 1.1,
-                fontSize: "clamp(20px,5vw,39px)",
-              }}
-            >
-             Everything You Need — Smarter, Faster, Together
-            </h1>
-            <p style={{ color: brand.sub, marginTop: 8, fontSize: 22, }}>
-             Unlock the Power of AI in Every Step
-            </p>
-          </Col>
-        </Row> }
+        {
+          <Row className="align-items-center">
+            <Col>
+              <h1
+                style={{
+                  fontWeight: 800,
+                  color: brand.ink,
+                  lineHeight: 1.1,
+                  fontSize: "clamp(20px,5vw,39px)",
+                }}
+              >
+                Everything You Need — Smarter, Faster, Together
+              </h1>
+              <p style={{ color: brand.sub, marginTop: 8, fontSize: 22 }}>
+                Unlock the Power of AI in Every Step
+              </p>
+            </Col>
+          </Row>
+        }
+
 
         {/* OUR FEATURES */}
         <section className="mt-4">
-          <h3 style={{ color: brand.ink, fontWeight: 800, marginBottom: 12,fontSize: "clamp(28px, 4vw, 40px)" }}>
+          <h3
+            style={{
+              color: brand.ink,
+              fontWeight: 800,
+              marginBottom: 12,
+              fontSize: "clamp(28px, 4vw, 40px)",
+            }}
+          >
             Our features
           </h3>
           <Row className="g-3">
             {features.map((f, i) => (
-              <Col md={6} lg={3} key={i}>
+              <Col md={4} key={i}>
                 <Card className="h-100 shadow-sm border-0" style={{ borderRadius: 16 }}>
                   <Card.Body>
                     <div style={{ fontSize: 28, marginBottom: 6 }}>{f.icon}</div>
@@ -121,6 +131,35 @@ export default function Feature() {
               </Col>
             ))}
           </Row>
+        </section>
+
+        {/*NEW: Test Coverage (Coming Soon) */}
+        <section className="mt-4">
+          <Card className="shadow-sm border-0" style={{ borderRadius: 16 }}>
+            <Card.Body>
+              <div className="d-flex align-items-center gap-2 mb-2">
+                <div style={{ fontSize: 30 }}>📈</div>
+                <h5 style={{ color: brand.ink, fontWeight: 800, margin: 0 }}>
+                  Test Coverage <Badge bg="secondary" pill>Coming Soon</Badge>
+                </h5>
+              </div>
+              <p style={{ color: brand.sub, marginBottom: 10 }}>
+                Add your acceptance criteria and existing tests/code — get a clear coverage % and exactly what’s missing.
+                We’ll also suggest the missing manual cases and automation skeletons.
+              </p>
+              <ul style={{ color: brand.sub, marginBottom: 0 }}>
+                <li>
+                  <b>Spec Coverage:</b> Maps each AC to tests (traceability) and shows % covered.
+                </li>
+                <li>
+                  <b>Code Coverage (optional):</b> Upload Istanbul/nyc (JS) or JaCoCo (Java) reports to view line/branch coverage.
+                </li>
+                <li>
+                  <b>Gap Finder:</b> Lists uncovered ACs and generates suggested test cases & code stubs.
+                </li>
+              </ul>
+            </Card.Body>
+          </Card>
         </section>
 
         {/* HOW IT WORKS */}
@@ -184,7 +223,7 @@ export default function Feature() {
           <h3 style={{ color: brand.ink, fontWeight: 800, marginBottom: 12 }}>
             Pick your path
           </h3>
-          <Row className="g-4">
+        <Row className="g-4">
             {roles.map((s) => (
               <Col md={4} key={s.id}>
                 <Card className="h-100 shadow-sm border-0" style={{ borderRadius: 16 }}>
@@ -226,7 +265,7 @@ export default function Feature() {
           </Row>
         </section>
 
-        {/* CTA BAND (bottom) */}
+        {/* CTA BAND (bottom)
         <section className="mt-5 pb-4">
           <Card className="border-0 shadow-sm" style={{ borderRadius: 16 }}>
             <Card.Body className="d-flex flex-column flex-md-row align-items-center justify-content-between">
@@ -254,7 +293,36 @@ export default function Feature() {
               </Button>
             </Card.Body>
           </Card>
-        </section>
+        </section> */}
+        {/* ALL-ROUNDER PROMO */}
+<section className="mt-3">
+  <Card className="border-0 shadow-sm" style={{ borderRadius: 16 }}>
+    <Card.Body className="d-flex flex-column flex-md-row align-items-center justify-content-between">
+      <div>
+        <h4 style={{ color: brand.ink, fontWeight: 800, marginBottom: 6 }}>
+          Try our All-Rounder feature
+        </h4>
+        <div style={{ color: brand.sub }}>
+          One flow: write one-liner → get User Story & AC → edit → (next) create Jira & generate tests.
+        </div>
+      </div>
+      <Button
+        as="a"
+        href="/all-rounder"
+        size="lg"
+        className="mt-3 mt-md-0"
+        style={{
+          background: brand.primary,
+          borderColor: brand.primary,
+          borderRadius: 12,
+          fontWeight: 700,
+        }}
+      >
+        Try All-Rounder
+      </Button>
+    </Card.Body>
+  </Card>
+</section>
       </Container>
     </div>
   );

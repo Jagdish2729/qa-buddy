@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Button, Navbar, Nav } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import genieImg from "../assets/genie.png";
 import AppNavbar from "../components/Navbar";

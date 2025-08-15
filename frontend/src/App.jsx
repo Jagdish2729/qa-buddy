@@ -4,6 +4,7 @@ import Home from "./pages/Home.jsx";
 import Feature from "./pages/Feature.jsx";
 import QA from "./pages/QA.jsx";
 import PO from "./pages/PO.jsx"; 
+import AllRounder from "./pages/AllRounder.jsx";
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
 
       {/* PO page (your existing one) */}
       <Route path="/po" element={<PO />} />
+      
+      <Route path="/all-rounder" element={<AllRounder />} />
 
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
