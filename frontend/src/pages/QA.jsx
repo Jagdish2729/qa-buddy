@@ -118,7 +118,23 @@ export default function QA() {
               Generate test cases, automation scripts & assets with a guided flow.
             </p>
           </Col>
+           <Col xs="auto">
+    <Button
+      type="button"
+      style={{
+        background: "#2B7DEA",
+        borderColor: "#2B7DEA",
+        borderRadius: 12,
+        fontWeight: 700,
+        color: "#fff", // white text
+      }}
+      onClick={() => (window.location.href = "/manual-test-cases")}
+    >
+      Have manual test cases?
+    </Button>
+  </Col>
         </Row>
+       
 
         {/* Two columns: Inputs/Actions (left) — Output (right) */}
         <Row className="g-4 mt-1">

@@ -1,12 +1,125 @@
-| Test Case ID | Description | Steps | Expected Result | Priority |
-|--------------|-------------|-------|-----------------|----------|
-| TC001 | User can click "Forgot Password" link on login page | 1. Navigate to the login page<br>2. Click on the "Forgot Password" link | Redirected to password reset form | High |
-| TC002 | User can submit registered email on password reset form | 1. Fill out the email field on the password reset form<br>2. Click the submit button | Receive an email with reset instructions | High |
-| TC003 | Email with reset instructions is sent to registered user | 1. Check email inbox<br>2. Verify that the email contains reset instructions | Email received with reset instructions | High |
-| TC004 | User can click link in reset email to set new password | 1. Click the link in the received email<br>2. Navigate to the new password setup page | Redirected to the new password setup page | High |
-| TC005 | New password meets complexity requirements | 1. Fill out the new password field on the new password setup page<br>2. Verify that the password meets complexity requirements (e.g., minimum length, mix of uppercase, lowercase, numbers, and special characters) | Password is saved and user is redirected to the login page | High |
-| TC006 | System shows error message if email is not registered | 1. Fill out the email field on the password reset form with an invalid email<br>2. Click the submit button | Error message displayed indicating that the email is not registered | High |
-| TC007 | Password is not shown in plain text during setup | 1. Fill out the new password field on the new password setup page<br>2. Verify that the password is not displayed in plain text | Password is not visible as plain text | High |
-| TC008 | Password reset functionality works on desktop and mobile | 1. Test password reset functionality on a desktop browser<br>2. Test password reset functionality on a mobile browser | Password reset functionality works on both desktop and mobile | High |
-| TC009 | User can log in with new password | 1. Fill out the email and new password fields on the login page<br>2. Click the login button | Successfully logged in | Medium |
-| TC010 | Previous password is not accepted after reset | 1. Attempt to log in with the old password<br>2. Verify that the login attempt fails | Login attempt fails with an error message | Medium |
+Below is a comprehensive Gherkin specification for the provided requirements, focusing on the major prompt engineering techniques, common mistakes, real-world use cases, and the password reset feature.
+
+```gherkin
+Feature: Role-Based Prompting
+  As a registered user,
+  In order to access the appropriate features,
+  I want to be prompted with role-specific options.
+
+  Scenario: User is prompted with role-specific options
+    Given I am a registered user with a specific role
+    When I log in to the application
+    Then I should see options relevant to my role
+
+Feature: Context & Constraint-Based Prompting
+  As a user,
+  In order to provide accurate information,
+  I want to be prompted with context-specific questions and constraints.
+
+  Scenario: User is prompted with context-specific questions
+    Given I am a user trying to create a new account
+    When I enter my industry as "Finance"
+    Then I should be prompted to provide additional financial information
+
+Feature: Few-Shot Prompting
+  As a user,
+  In order to save time,
+  I want the system to suggest options based on my previous interactions.
+
+  Scenario: System suggests options based on previous interactions
+    Given I am a user who has previously searched for "IT services"
+    When I start typing "it" in the search bar
+    Then the system should suggest "IT services" as an option
+
+Feature: Chain of Thought (CoT)
+  As a user,
+  In order to provide a coherent response,
+  I want the system to prompt me with a series of questions that guide my thought process.
+
+  Scenario: System prompts user with a chain of thought
+    Given I am a user trying to create a marketing campaign
+    When I select "Create a new campaign"
+    Then the system should prompt me with a series of questions to help me define my campaign objectives, target audience, and messaging
+
+Feature: Tree of Thought (ToT)
+  As a user,
+  In order to explore multiple options,
+  I want the system to present me with a hierarchical structure of related questions.
+
+  Scenario: System presents user with a tree of thought
+    Given I am a user trying to troubleshoot an IT issue
+    When I select "Troubleshoot IT issues"
+    Then the system should present me with a tree of thought, allowing me to drill down into specific problem areas and potential solutions
+
+Feature: Self-Consistency Prompting
+  As a user,
+  In order to ensure my responses are consistent,
+  I want the system to prompt me with questions that check for self-consistency.
+
+  Scenario: System checks for self-consistency
+    Given I am a user creating a new customer profile
+    When I enter the customer's name as "John Doe"
+    And I enter the customer's email as "johndoe@example.com"
+    Then the system should prompt me to confirm that the name and email are correct, as they appear inconsistent
+
+Feature: ReAct Prompting
+  As a user,
+  In order to improve the system's understanding,
+  I want the system to react to my responses and adjust its prompts accordingly.
+
+  Scenario: System reacts to user's responses
+    Given I am a user trying to create a new account
+    When I enter my industry as "Finance"
+    And I select "Investment Banking" as my specific role
+    Then the system should adjust its prompts to ask for more detailed investment banking-related information
+
+Feature: Multimodal Prompting
+  As a user,
+  In order to interact with the system more naturally,
+  I want the system to support multiple input methods, such as text, voice, and images.
+
+  Scenario: System supports multiple input methods
+    Given I am a user trying to describe a problem with a visual aid
+    When I upload an image of a broken device
+    Then the system should prompt me with questions about the device and the problem it's experiencing
+
+Feature: Common Mistakes and Fixes
+
+  Scenario: Incorrect email format
+    Given I am trying to reset my password
+    When I enter an email address without an "@" symbol
+    Then the system should show an error message and prompt me to enter a valid email address
+
+  Scenario: Weak password
+    Given I am trying to set a new password
+    When I enter a password that does not meet complexity requirements
+    Then the system should show an error message and prompt me to enter a stronger password
+
+Feature: Real-World Use Case Workflows
+
+  Scenario: Marketing
+    Given I am a marketing professional
+    When I log in to the application
+    And I select "Create a new campaign"
+    Then I should be prompted with a series of questions to help me define my campaign objectives, target audience, and messaging
+
+  Scenario: Finance
+    Given I am a financial analyst
+    When I log in to the application
+    And I select "Analyze financial data"
+    Then I should be prompted with questions to help me specify the data I want to analyze, the time period, and the type of analysis I want to perform
+
+  Scenario: Customer Service
+    Given I am a customer service representative
+    When I log in to the application
+    And I select "Handle customer inquiries"
+    Then I should be presented with a list of pending customer inquiries and prompts to help me respond to each inquiry
+
+  Scenario: IT
+    Given I am an IT support technician
+    When I log in to the application
+    And I select "Troubleshoot IT issues"
+    Then I should be presented with a tree of thought, allowing me to drill down into specific problem areas and potential solutions
+```
+
+This Gherkin specification covers the major prompt engineering techniques, common mistakes, and real-world use cases, while maintaining a business acceptance test perspective. The password reset feature is also included as a separate scenario within the Common Mistakes and Fixes feature. The scenarios are written in a clear, readable, and testable manner, making them suitable for QA engineers, developers, and non-technical stakeholders. The Indian market and professional

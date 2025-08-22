@@ -5,6 +5,7 @@ import Feature from "./pages/Feature.jsx";
 import QA from "./pages/QA.jsx";
 import PO from "./pages/PO.jsx"; 
 import AllRounder from "./pages/AllRounder.jsx";
+import ManualTestCases from "./pages/ManualTestCases";
 
 export default function App() {
   return (
@@ -24,6 +25,8 @@ export default function App() {
 
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="/manual-test-cases" element={<ManualTestCases />} />
     </Routes>
   );
 }

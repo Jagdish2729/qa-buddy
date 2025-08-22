@@ -6,6 +6,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
+const path = require("path");
 
 const { generateTestCases } = require("./openaiService");
 const { getJiraTicketDetails, createIssue } = require("./jiraService");
@@ -18,16 +19,44 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ----- Multer setup (uploads) -----
+const storage = multer.memoryStorage();
+
+const ALLOWED_EXT = new Set([
+  ".png", ".jpg", ".jpeg", ".pdf", ".fig",
+  ".csv", ".xlsx", ".json", ".md", ".txt",
+]);
+
+const ALLOWED_MIME = new Set([
+  "image/png",
+  "image/jpeg",
+  "application/pdf",
+  "text/csv",
+  "application/csv",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/json",
+  "text/markdown",
+  "text/plain",
+  "application/octet-stream",
+]);
+
+const fileFilter = (req, file, cb) => {
+  const ext = (path.extname(file.originalname || "") || "").toLowerCase();
+  const mime = (file.mimetype || "").toLowerCase();
+
+  if (ALLOWED_EXT.has(ext) || ALLOWED_MIME.has(mime)) return cb(null, true);
+
+  if (ext === ".csv" || ext === ".xlsx" || ext === ".fig") return cb(null, true);
+
+  return cb(new Error("Unsupported file type"));
+};
+
 const upload = multer({
-  storage: multer.memoryStorage(),                 // files memory me aayengi: file.buffer
-  limits: { fileSize: 10 * 1024 * 1024, files: 10 }, // 10MB/file, max 10 files
-  fileFilter: (req, file, cb) => {
-    // Allowed: png, jpg, jpeg, pdf, fig (figma)
-    const ok = /png|jpg|jpeg|pdf|fig$/i.test(file.originalname);
-    if (!ok) return cb(new Error("Unsupported file type"), false);
-    cb(null, true);
-  },
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 20 },
+  fileFilter,
 });
+
 
 // ----- Routes -----
 app.use("/po", poRoutes);
@@ -119,6 +148,22 @@ app.post("/jira/create", async (req, res) => {
     });
   }
 });
+app.post(
+  "/manual/generate",
+  upload.fields([{ name: "manualFiles", maxCount: 20 }]),
+  async (req, res) => {
+    try {
+      const kind = String(req.body.mode || "");
+      const files = req.files?.manualFiles || [];
+      const { generateFromManualFiles } = require("./openaiService");
+      const { text, casesCount } = await generateFromManualFiles(files, kind);
+      return res.json({ success: true, result: text, count: casesCount });
+    } catch (e) {
+      console.error("❌ /manual/generate:", e);
+      return res.status(500).json({ success: false, message: e.message || "Server error" });
+    }
+  }
+);
 
 app.listen(3000, () => {
   console.log("✅ Server running on http://localhost:3000");
