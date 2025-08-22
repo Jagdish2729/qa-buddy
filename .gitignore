@@ -6,3 +6,5 @@ frontend/.env
 # --- dependencies ---
 node_modules/
 
+# bogus Windows device-name file
+NUL
