@@ -1,79 +1,12 @@
-Here's an example of how you could structure your Playwright tests using TypeScript and the Page Object Model (POM) approach for the provided acceptance criteria.
-
-First, let's create a `filters.ts` page object:
-
-```typescript
-// filters.ts
-
-import { Page } from '@playwright/test';
-
-export class FiltersPage {
-  readonly filterOptionLocator = this.locator('filter-option');
-  readonly tooltipLocator = this.locator('.tooltip');
-  readonly selectedFilterLocator = this.locator('.selected-filter');
-
-  constructor(private page: Page) {}
-
-  async hoverFilterOption(filterName: string) {
-    await this.page.waitForSelector(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
-    await this.page.hover(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
-    await this.page.waitForSelector(this.tooltipLocator);
-  }
-
-  async clickFilterOption(filterName: string) {
-    await this.page.click(this.filterOptionLocator(`[data-filter-name="${filterName}"]`));
-  }
-
-  async getFilterCount(filterName: string) {
-    return this.page.locator(this.filterOptionLocator(`[data-filter-name="${filterName}"]`)).getAttribute('data-filter-count');
-  }
-
-  // Add more methods as needed...
-}
-```
-
-Next, let's create a `filters.spec.ts` test file:
-
-```typescript
-// filters.spec.ts
-
-import { test, expect } from '@playwright/test';
-import { FiltersPage } from './filters';
-
-let filtersPage: FiltersPage;
-
-test.beforeEach(async ({ page }) => {
-  filtersPage = new FiltersPage(page);
-  // Navigate to the filters page...
-});
-
-test('Apply single filter', async () => {
-  // ...
-  await filtersPage.hoverFilterOption('Filter1');
-  await filtersPage.clickFilterOption('Filter1');
-  // ...
-});
-
-test('Apply multiple filters', async () => {
-  // ...
-  await filtersPage.hoverFilterOption('Filter1');
-  await filtersPage.clickFilterOption('Filter1');
-  await filtersPage.hoverFilterOption('Filter2');
-  await filtersPage.clickFilterOption('Filter2');
-  // ...
-});
-
-test('Clear all filters', async () => {
-  // ...
-  await filtersPage.clickFilterOption('Filter1'); // Assuming that clicking on a selected filter clears it
-  // ...
-});
-
-// Add more tests as needed...
-```
-
-Make sure to replace the comments with your actual test logic and navigation to the filters page.
-
-This example demonstrates a simple implementation of the Page Object Model (POM) pattern, where we have a `FiltersPage` class that contains locators and methods for interacting with the filters on the page. The test logic is then separated in the `filters.spec.ts` file, which imports the `FiltersPage` class and instantiates it within the `test.beforeEach()` hook.
-
-You can extend this example by adding more methods to the `FiltersPage` class as needed, such as methods for selecting multiple filters, checking the number of matching items, and handling loading indicators, empty lists, and other acceptance criteria.
+| Test Case ID | Description | Steps | Expected Result | Priority |
+|--------------|-------------|-------|-----------------|----------|
+| TC001 | User can click "Forgot Password" link on login page | 1. Navigate to the login page<br>2. Click on the "Forgot Password" link | Redirected to password reset form | High |
+| TC002 | User can submit registered email on password reset form | 1. Fill out the email field on the password reset form<br>2. Click the submit button | Receive an email with reset instructions | High |
+| TC003 | Email with reset instructions is sent to registered user | 1. Check email inbox<br>2. Verify that the email contains reset instructions | Email received with reset instructions | High |
+| TC004 | User can click link in reset email to set new password | 1. Click the link in the received email<br>2. Navigate to the new password setup page | Redirected to the new password setup page | High |
+| TC005 | New password meets complexity requirements | 1. Fill out the new password field on the new password setup page<br>2. Verify that the password meets complexity requirements (e.g., minimum length, mix of uppercase, lowercase, numbers, and special characters) | Password is saved and user is redirected to the login page | High |
+| TC006 | System shows error message if email is not registered | 1. Fill out the email field on the password reset form with an invalid email<br>2. Click the submit button | Error message displayed indicating that the email is not registered | High |
+| TC007 | Password is not shown in plain text during setup | 1. Fill out the new password field on the new password setup page<br>2. Verify that the password is not displayed in plain text | Password is not visible as plain text | High |
+| TC008 | Password reset functionality works on desktop and mobile | 1. Test password reset functionality on a desktop browser<br>2. Test password reset functionality on a mobile browser | Password reset functionality works on both desktop and mobile | High |
+| TC009 | User can log in with new password | 1. Fill out the email and new password fields on the login page<br>2. Click the login button | Successfully logged in | Medium |
+| TC010 | Previous password is not accepted after reset | 1. Attempt to log in with the old password<br>2. Verify that the login attempt fails | Login attempt fails with an error message | Medium |

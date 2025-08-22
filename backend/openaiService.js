@@ -65,16 +65,23 @@ async function generateTestCases(jiraText, mode) {
        `You are a precise QA assistant.
 
 TASK:
-From the acceptance criteria below, output ONLY a GitHub-flavored Markdown table of test cases.
+From the provided acceptance criteria (and Figma design if uploaded), output ONLY a GitHub-flavored Markdown table of test cases.
 
 REQUIREMENTS:
-- Columns EXACTLY: Test Case ID | Description | Steps | Expected Result | Priority
-- Include the mandatory separator row after the header:
-  | Test Case ID | Description | Steps | Expected Result | Priority |
-  |--------------|-------------|-------|-----------------|----------|
-- Provide AT LEAST 6 full test cases (IDs: TC001...TC006).
-- "Steps" must be a numbered list inside a single cell (e.g., "1) ..., 2) ..., 3) ...").
-- No extra text, no headings, no code fences, no explanations. Table ONLY.
+
+Columns EXACTLY: Test Case ID | Description | Steps | Expected Result | Priority
+
+Include the mandatory separator row after the header:
+| Test Case ID | Description | Steps | Expected Result | Priority |
+|--------------|-------------|-------|-----------------|----------|
+
+Provide AT LEAST 10 full test cases (IDs: TC001...TC010).
+
+"Steps" must be a numbered list inside a single cell (e.g., 1) ..., 2) ..., 3) ...).
+
+If a Figma design is provided, incorporate visual and UI/UX elements into the Description, Steps, and Expected Result to ensure accuracy, creativity, and technical depth.
+
+No extra text, no headings, no code fences, no explanations. Table ONLY.
 
 Acceptance Criteria:
 ${jiraText}
