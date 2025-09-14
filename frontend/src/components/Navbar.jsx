@@ -1,6 +1,7 @@
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import genieImg from "../assets/genie.png";
+import kastleLogo from "../assets/kastle.png";
 
 export default function AppNavbar() {
   const brandColor = "#0B4A6E";
@@ -8,16 +9,18 @@ export default function AppNavbar() {
   return (
     <Navbar expand="lg" variant="light" style={{ background: "transparent" }}>
       <Container>
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
-          <img
-            src={genieImg}
-            alt="Genie Mascot"
-            style={{ width: 24, height: 24, objectFit: "contain" }}
-          />
-          <span style={{ fontWeight: 700, fontSize: 24, color: brandColor }}>
-            AgileGenieAI
-          </span>
-        </Navbar.Brand>
+         <Navbar.Brand href="/">
+  <img
+    src={kastleLogo}
+    alt="kastle logo"
+    width="98"
+    height="68"
+    className="me-2"
+  />
+  <span style={{ color: "#05529fff", fontWeight: 900 ,fontSize: "1.8rem",letterSpacing: "0.5px",}}>
+    KastleGenieAI
+  </span>
+</Navbar.Brand>
 
         <Navbar.Toggle aria-controls="main-nav" />
         <Navbar.Collapse id="main-nav" className="justify-content-end">

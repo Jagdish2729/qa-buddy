@@ -1,125 +1,113 @@
-Below is a comprehensive Gherkin specification for the provided requirements, focusing on the major prompt engineering techniques, common mistakes, real-world use cases, and the password reset feature.
+Here's a basic example of Playwright tests for the provided acceptance criteria using TypeScript and Page Object Model. Please note that this is a simplified version and might need adjustments based on your specific project setup.
 
-```gherkin
-Feature: Role-Based Prompting
-  As a registered user,
-  In order to access the appropriate features,
-  I want to be prompted with role-specific options.
+```typescript
+// country-dropdown.ts (Page Object)
+import { Page } from '@playwright/test';
 
-  Scenario: User is prompted with role-specific options
-    Given I am a registered user with a specific role
-    When I log in to the application
-    Then I should see options relevant to my role
+export class CountryDropdown {
+  constructor(private page: Page) {}
 
-Feature: Context & Constraint-Based Prompting
-  As a user,
-  In order to provide accurate information,
-  I want to be prompted with context-specific questions and constraints.
+  async isCountryDropdownVisible() {
+    return this.page.getByRole('listbox', { name: 'Country' }).isVisible();
+  }
 
-  Scenario: User is prompted with context-specific questions
-    Given I am a user trying to create a new account
-    When I enter my industry as "Finance"
-    Then I should be prompted to provide additional financial information
+  async selectCountry(country: string) {
+    return this.page.getByRole('listitem', { name: country }).click();
+  }
 
-Feature: Few-Shot Prompting
-  As a user,
-  In order to save time,
-  I want the system to suggest options based on my previous interactions.
+  async getSelectedCountry() {
+    return this.page.getByRole('listbox').getAttribute('value');
+  }
 
-  Scenario: System suggests options based on previous interactions
-    Given I am a user who has previously searched for "IT services"
-    When I start typing "it" in the search bar
-    Then the system should suggest "IT services" as an option
+  async getErrorMessage() {
+    return this.page.getByRole('alert').textContent();
+  }
 
-Feature: Chain of Thought (CoT)
-  As a user,
-  In order to provide a coherent response,
-  I want the system to prompt me with a series of questions that guide my thought process.
+  async searchCountry(country: string) {
+    const input = this.page.getByRole('textbox', { name: 'Search' });
+    await input.fill(country);
+    await input.press('Enter');
+  }
+}
 
-  Scenario: System prompts user with a chain of thought
-    Given I am a user trying to create a marketing campaign
-    When I select "Create a new campaign"
-    Then the system should prompt me with a series of questions to help me define my campaign objectives, target audience, and messaging
+// country-form.spec.ts
+import { test, expect } from '@playwright/test';
+import { launch, newPage } from '@playwright/test';
+import { CountryDropdown } from './country-dropdown';
 
-Feature: Tree of Thought (ToT)
-  As a user,
-  In order to explore multiple options,
-  I want the system to present me with a hierarchical structure of related questions.
+let page: Page;
+let countryDropdown: CountryDropdown;
 
-  Scenario: System presents user with a tree of thought
-    Given I am a user trying to troubleshoot an IT issue
-    When I select "Troubleshoot IT issues"
-    Then the system should present me with a tree of thought, allowing me to drill down into specific problem areas and potential solutions
+test.beforeAll(async () => {
+  const browser = await launch({ headless: false });
+  page = await browser.newPage();
+});
 
-Feature: Self-Consistency Prompting
-  As a user,
-  In order to ensure my responses are consistent,
-  I want the system to prompt me with questions that check for self-consistency.
+test.describe('Country Dropdown', () => {
+  test('should display all available countries', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Add assertion for all available countries
+  });
 
-  Scenario: System checks for self-consistency
-    Given I am a user creating a new customer profile
-    When I enter the customer's name as "John Doe"
-    And I enter the customer's email as "johndoe@example.com"
-    Then the system should prompt me to confirm that the name and email are correct, as they appear inconsistent
+  test('should allow selecting a country', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Select a country
+    // TODO: Assert that the country is selected
+  });
 
-Feature: ReAct Prompting
-  As a user,
-  In order to improve the system's understanding,
-  I want the system to react to my responses and adjust its prompts accordingly.
+  test('should save and persist the selected country', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Select a country
+    // TODO: Navigate away and then back to the form page
+    // TODO: Assert that the previously selected country is still selected
+  });
 
-  Scenario: System reacts to user's responses
-    Given I am a user trying to create a new account
-    When I enter my industry as "Finance"
-    And I select "Investment Banking" as my specific role
-    Then the system should adjust its prompts to ask for more detailed investment banking-related information
+  test('should display an error message for invalid or unsupported countries', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Select an invalid or unsupported country
+    // TODO: Assert that an error message is displayed
+  });
 
-Feature: Multimodal Prompting
-  As a user,
-  In order to interact with the system more naturally,
-  I want the system to support multiple input methods, such as text, voice, and images.
+  test('should update the dropdown list with new countries', async () => {
+    // TODO: Add new countries to the system
+    // TODO: Navigate to the form page
+    // TODO: Assert that the new countries are in the dropdown list
+  });
 
-  Scenario: System supports multiple input methods
-    Given I am a user trying to describe a problem with a visual aid
-    When I upload an image of a broken device
-    Then the system should prompt me with questions about the device and the problem it's experiencing
+  test('should respect the user\'s language preference', async () => {
+    // TODO: Set user's language preference
+    // TODO: Navigate to the form page
+    // TODO: Assert that country names are displayed in the user's preferred language
+  });
 
-Feature: Common Mistakes and Fixes
+  test('should allow searching for a specific country', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Search for a specific country
+    // TODO: Assert that the searched country is displayed
+  });
 
-  Scenario: Incorrect email format
-    Given I am trying to reset my password
-    When I enter an email address without an "@" symbol
-    Then the system should show an error message and prompt me to enter a valid email address
+  test('should remember the selection for future sessions', async () => {
+    // TODO: Select a country
+    // TODO: Close the browser
+    // TODO: Reopen the browser and navigate to the form page
+    // TODO: Assert that the previously selected country is still selected
+  });
 
-  Scenario: Weak password
-    Given I am trying to set a new password
-    When I enter a password that does not meet complexity requirements
-    Then the system should show an error message and prompt me to enter a stronger password
+  test('should be accessible to users with disabilities', async () => {
+    // TODO: Add accessibility testing using axe-core or similar tool
+  });
 
-Feature: Real-World Use Case Workflows
+  test('should include the selected country in the form data', async () => {
+    // TODO: Navigate to the form page
+    // TODO: Select a country
+    // TODO: Submit the form
+    // TODO: Assert that the selected country is included in the form data
+  });
 
-  Scenario: Marketing
-    Given I am a marketing professional
-    When I log in to the application
-    And I select "Create a new campaign"
-    Then I should be prompted with a series of questions to help me define my campaign objectives, target audience, and messaging
-
-  Scenario: Finance
-    Given I am a financial analyst
-    When I log in to the application
-    And I select "Analyze financial data"
-    Then I should be prompted with questions to help me specify the data I want to analyze, the time period, and the type of analysis I want to perform
-
-  Scenario: Customer Service
-    Given I am a customer service representative
-    When I log in to the application
-    And I select "Handle customer inquiries"
-    Then I should be presented with a list of pending customer inquiries and prompts to help me respond to each inquiry
-
-  Scenario: IT
-    Given I am an IT support technician
-    When I log in to the application
-    And I select "Troubleshoot IT issues"
-    Then I should be presented with a tree of thought, allowing me to drill down into specific problem areas and potential solutions
+  test.afterAll(async () => {
+    await page.close();
+  });
+});
 ```
 
-This Gherkin specification covers the major prompt engineering techniques, common mistakes, and real-world use cases, while maintaining a business acceptance test perspective. The password reset feature is also included as a separate scenario within the Common Mistakes and Fixes feature. The scenarios are written in a clear, readable, and testable manner, making them suitable for QA engineers, developers, and non-technical stakeholders. The Indian market and professional
+This example demonstrates a basic structure for your tests, but you'll need to fill in the TODO comments with your specific selectors, URLs, and assertions based on your project setup. Additionally, you might want to consider adding more tests for edge cases and specific user scenarios.
